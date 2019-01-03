@@ -20,9 +20,6 @@ You can install the library via `npm`:
 
 ## Usage
 
-In order to use it, just import the library and pass the previous params in the constructor.
-By default the library is loaded with the following value, so you just have to pass a private key and then you can start to use Fuel.
-
 The package need to be configured with an ethereum private key or a web3 wallet instance (eg. Metamask)
 
 ```javascript

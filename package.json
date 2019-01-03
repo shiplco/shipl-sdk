@@ -1,6 +1,6 @@
 {
   "name": "shipl",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Shipl API wrapper and web3 provider",
   "keywords": [
     "shipl",
