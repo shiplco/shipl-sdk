@@ -14,8 +14,8 @@ See the [API documentation]('https://docs.shipl.co')
 
 You can install the library via `npm`:
 
-```javascript
-npm i shipl
+```sh
+> npm i shipl
 ```
 
 ## Usage
@@ -29,9 +29,9 @@ The package need to be configured with an ethereum private key or a web3 wallet 
 import Shipl from 'shipl';
 
 const shipl = new Shipl({
-	privateKey: "YOUR_PRIVATE_KEY", // You can provide a private key to shipl
-	web3Provider: window.web3, // Or a web3 compatilbe wallet like Metamask
-	network: 'rinkeby' // Can be rinkeby, ropsten or kovan (mainnet not available yet)
+    privateKey: "YOUR_PRIVATE_KEY", // You can provide a private key to shipl
+    web3Provider: window.web3, // Or a web3 compatilbe wallet like Metamask
+    network: 'rinkeby' // Can be rinkeby, ropsten or kovan (mainnet not available yet)
 })
 ```
 
