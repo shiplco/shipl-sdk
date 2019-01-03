@@ -31,7 +31,7 @@ import Shipl from 'shipl';
 const shipl = new Shipl({
 	privateKey: "YOUR_PRIVATE_KEY", // You can provide a private key to shipl
 	web3Provider: window.web3, // Or a web3 compatilbe wallet like Metamask
-  network: 'rinkeby', // Can be rinkeby, ropsten or kovan (mainnet not available yet)
+	network: 'rinkeby' // Can be rinkeby, ropsten or kovan (mainnet not available yet)
 })
 ```
 
