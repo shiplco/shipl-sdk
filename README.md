@@ -14,8 +14,8 @@ See the [API documentation]('https://docs.shipl.co')
 
 You can install the library via `npm`:
 
-```sh
-> npm i shipl
+```shell
+npm i shipl
 ```
 
 ## Usage
@@ -93,4 +93,4 @@ const shipl = new Shipl({ privateKey, network })
 
 ## Examples
 
-For a more in depth guide, check out our documentation site or clone this repository and check out the sample apps in the `/examples` folder.
+For a more in depth guide, check out our documentation site or clone this repository and check out the sample apps in the [`/examples`](https://github.com/shiplco/shipl-sdk/tree/master/examples/node-integration-tutorial) folder.
