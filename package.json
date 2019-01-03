@@ -1,0 +1,61 @@
+{
+  "name": "shipl",
+  "version": "1.0.1",
+  "description": "Shipl API wrapper and web3 provider",
+  "keywords": [
+    "shipl",
+    "ethereum",
+    "web3",
+    "api"
+  ],
+  "homepage": "https://docs.shipl.co",
+  "author": "Abdallah-Hossayn Mokhtar Bacha <mokhtarbacha@protonmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:shiplco/shipl-sdk.git"
+  },
+  "bugs:": "https://github.com/shiplco/shipl-sdk/issues",
+  "main": "./dist/shipl.node.js",
+  "browser": "./dist/shipl.js",
+  "scripts": {
+    "build": "npm run build-dist",
+    "build-dist": "webpack --config webpack.config.js",
+    "build-dist-prod": "webpack --config webpack.prod.js",
+    "test": "jest --forceExit --coverage --verbose"
+  },
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "abi-decoder": "^1.2.0",
+    "axios": "^0.18.0",
+    "babel-loader": "^8.0.0-beta.4",
+    "bignumber.js": "^7.2.1",
+    "bluebird": "^3.5.1",
+    "crypto-js": "^3.1.9-1",
+    "eth-sig-util": "^1.2.1",
+    "ethereumjs-util": "^5.1.1",
+    "ethjs": "^0.2.6",
+    "js-scrypt": "^0.2.0",
+    "left-pad": "^1.3.0",
+    "request": "^2.85.0",
+    "solidity-sha3": "^0.4.1",
+    "uport-identity": "^2.0.1",
+    "util": "^0.11.0",
+    "web3": "^1.0.0-beta.33",
+    "web3-eth-abi": "^1.0.0-beta.35",
+    "web3-provider-engine": "^14.0.5",
+    "webpack-cli": "^3.0.8",
+    "websocket": "^1.0.28",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.1.2",
+    "nodemon": "^1.13.0",
+    "source-map-loader": "^0.2.3",
+    "standard": "^11.0.1",
+    "webpack": "^4.14.0"
+  }
+}
