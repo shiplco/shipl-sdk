@@ -50,6 +50,7 @@
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
+    "ava": "^1.0.1",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",

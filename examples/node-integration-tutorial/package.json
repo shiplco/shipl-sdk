@@ -1,22 +1,21 @@
 {
-    "name": "shipl-node-example",
-    "version": "1.0.0",
-    "description": "Example of integration of shipl into a node app",
-    "main": "src/index.js",
-    "scripts": {
-      "start": "node src/index.js",
-      "watch": "nodemon /src/index.js"
-    },
-    "author": "Abdallah-Hossayn Mokhtar Bacha <mokhtarbacha@protonmail.com>",
-    "license": "AGPL-3.0",
-    "dependencies": {
-      "shipl": "^1.0.0",
-      "typedarray-to-buffer": "^3.1.5",
-      "web3": "^1.0.0-beta.36",
-      "ws": "^6.0.0"
-    },
-    "devDependencies": {
-      "nodemon": "^1.13.0"
-    }
+  "name": "shipl-node-example",
+  "version": "1.0.0",
+  "description": "Example of integration of shipl into a node app",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "watch": "nodemon /src/index.js"
+  },
+  "author": "Abdallah-Hossayn Mokhtar Bacha <mokhtarbacha@protonmail.com>",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "async-get-json": "^4.0.0",
+    "ethjs": "^0.4.0",
+    "promise-to-callback": "^1.0.0",
+    "shipl": "^1.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.13.0"
   }
-  
+}
