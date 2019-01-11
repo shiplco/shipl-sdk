@@ -25,7 +25,6 @@
   },
   "license": "AGPL-3.0",
   "dependencies": {
-    "@babel/core": "^7.0.0-beta.51",
     "@babel/preset-env": "^7.0.0-beta.51",
     "abi-decoder": "^1.2.0",
     "axios": "^0.18.0",
@@ -50,12 +49,24 @@
     "xmlhttprequest": "^1.8.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.2",
     "babel-cli": "^6.26.0",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
+    "jest": "^23.6.0",
     "nodemon": "^1.13.0",
     "source-map-loader": "^0.2.3",
     "standard": "^11.0.1",
     "webpack": "^4.14.0"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ],
+    "globals": [
+      "fail"
+    ]
   }
 }
