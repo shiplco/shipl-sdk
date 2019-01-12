@@ -107,7 +107,6 @@ describe('RpcSource', () => {
       mockXhr.mockImplementation((options, cb) => {
         cb(null, {statusCode: 200}, JSON.stringify({result: 'test-body-result'}))
       })
-      console.error('laksjdlksjldkajsldkj')
       sut.handleRequest('hello', {}, (error, msg) => {
         if (error) {
           fail(error)
