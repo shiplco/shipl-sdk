@@ -55,6 +55,7 @@
     "babel-jest": "^23.6.0",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
+    "cz-conventional-changelog": "^2.1.0",
     "jest": "^23.6.0",
     "nodemon": "^1.13.0",
     "source-map-loader": "^0.2.3",
@@ -68,5 +69,10 @@
     "globals": [
       "fail"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
