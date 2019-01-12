@@ -21,7 +21,7 @@
     "build": "npm run build-dist",
     "build-dist": "webpack --config webpack.config.js",
     "build-dist-prod": "webpack --config webpack.prod.js",
-    "test": "jest --forceExit --coverage --verbose"
+    "test": "jest --coverage --verbose"
   },
   "license": "AGPL-3.0",
   "dependencies": {

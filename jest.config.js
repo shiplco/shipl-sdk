@@ -5,6 +5,7 @@ module.exports = {
   testPathIgnorePatterns: ['/node_modules/'],
   verbose: true,
   collectCoverage: true,
+  collectCoverageFrom: ['src/**/*.js'],
   coverageDirectory: './coverage/',
   setupFiles: ['<rootDir>/node_modules/regenerator-runtime/runtime']
 
