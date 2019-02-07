@@ -15,13 +15,15 @@ const TxRelaySigner = require('./services/shipl-eth-signer/txRelaySigner')
 const KeyPair = require('./services/shipl-eth-signer/generators/keyPair')
 const InternalTxDisecter = require('./services/decoder')
 const IdMgnt = require('./services/idMgnt')
+const jwtDecode = require('jwt-decode')
 
 const engine = new ProviderEngine()
 const txRelayArtifact = UportIdentity.TxRelay.v2
 
 class Provider {
   constructor (
-    { privateKey,
+    { appId,
+      privateKey,
       web3Provider,
       proxyAddress,
       network,
@@ -35,6 +37,7 @@ class Provider {
       whiteListAddress = '0x0000000000000000000000000000000000000000'
     }) {
     this.rpcUrl = rpcUrl
+    this.appId = appId
     this.sensuiUrl = sensuiUrl
     this.nisabaUrl = nisabaUrl
     this.unnuUrl = unnuUrl
@@ -92,15 +95,18 @@ class Provider {
     this.TxRelay = BlueBird.promisifyAll(new this.web3.eth.Contract(txRelayArtifact.abi, this.txRelayAddress))
     this.txRelaySigner = new TxRelaySigner(this.senderKeyPair, this.txRelayAddress, this.txSenderAddress, this.whiteListAddress)
     this.internalTxDisecter = new InternalTxDisecter(this.web3)
-    this.idMgnt = new IdMgnt({ nisabaUrl: this.nisabaUrl, unnuUrl: this.unnuUrl, blockchain: this.network, senderKeyPair: this.senderKeyPair })
+    this.idMgnt = new IdMgnt({ appId: this.appId, nisabaUrl: this.nisabaUrl, unnuUrl: this.unnuUrl, blockchain: this.network, senderKeyPair: this.senderKeyPair })
     this.getInternalTransactionsData = this.internalTxDisecter.getInternalTransactionsData
     this.login = this.login
     this.start = this.start
   }
   async login (inputCallback) {
-    const identityObj = await this.idMgnt.getUserOrCreate(this.senderKeyPair.address, inputCallback)
-    this.proxyAddress = identityObj.identity
+    let identityObj = await this.idMgnt.getUserOrCreate(this.senderKeyPair.address, inputCallback)
+    // TODO change this
+    // this.proxyAddress = identityObj.identity
+    this.proxyAddress = '0xab678f1fddb9b2ff3ae7ba568a42b86789598a7f'
     this.authToken = identityObj.authToken
+    identityObj.deviceKey = jwtDecode(identityObj.authToken.IdToken)['custom:deviceKey']
     return identityObj
   }
   start () {

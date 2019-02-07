@@ -25,7 +25,8 @@ class RpcSource extends Subprovider {
       'Content-Type': 'application/json'
     }
     xhr({
-      uri: payload.method === ('eth_sendRawTransaction') ? (this.sensuiUrl + '/relay') : (this.rpcUrl),
+      // uri: payload.method === ('eth_sendRawTransaction') ? (this.sensuiUrl + '/relay') : (this.rpcUrl),
+      uri: payload.method === ('eth_sendRawTransaction') ? ('http://localhost:3000' + '/trigger') : (this.rpcUrl),
       method: 'POST',
       headers: payload.method === ('eth_sendRawTransaction') ? (Object.assign(headers, { Authorization: 'Bearer ' + this.authToken })) : (headers),
       body: JSON.stringify(newPayload),
