@@ -175,7 +175,8 @@ class Provider {
           const params = {
             metaNonce: txParams.nonce,
             metaSignedTx,
-            blockchain: this.network
+            blockchain: this.network,
+            appId: this.appId
           }
           return (null, params)
         }
