@@ -2,7 +2,7 @@ const Shipl = require('shipl')
 const Web3 = require('web3')
 const readline = require('readline-sync')
 const { Wallet } = require('ethers')
-const targetContractArtifact = require('./exampleContract.json')
+const targetContractArtifact = require('./targetContract.json')
 
 const privateKey = new Wallet.createRandom().privateKey // We generate a random ethereum private key
 
