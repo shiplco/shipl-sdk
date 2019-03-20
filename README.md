@@ -27,8 +27,9 @@ import Shipl from 'shipl';
 
 const shipl = new Shipl({
     privateKey: "YOUR_PRIVATE_KEY", // You can provide a private key to shipl
-    web3Provider: window.web3, // Or a web3 compatilbe wallet like Metamask
+    web3Provider: window.web3, // Or a web3 compatible wallet like Metamask
     network: 'rinkeby' // Can be rinkeby, ropsten or kovan (mainnet not available yet)
+    appId: 'YOUR_SHIPL_APP_ID' // This is the appID created in your Shipl Account at console.shipl.co
 })
 ```
 
@@ -41,7 +42,7 @@ const { identity, deviceKey } = await shipl.login(readline.question)
 Then pass you can pass the shipl sdk into any web3 compatible library. Don't forget to execute the start function to launch the web3 provider.
 
 ```javascript
-const web3 = new Web3(shipl.start());
+const web3 = new Web3(shipl.getWeb3Provider());
 ```
 Then you can call a contract in the regular web3 way
 
@@ -74,10 +75,8 @@ For use directly in the browser you can reference the shipl distribution files f
 For a quick setup you may also request a remote copy from unpkg CDN as follows:
 
 ```html
-<!-- The most recent version  -->
-<script src="https://unpkg.com/shipl/dist/shipl.js"></script>
 <!-- The most recent minified version  -->
-<script src="https://unpkg.com/shipl/dist/shipl.min.js"></script>
+<script src="https://unpkg.com/shipl/dist/shipl.js"></script>
 <!-- You can also fetch specific versions by specifying the version, files names may differ for past versions -->
 <script src="https://unpkg.com/shipl@<version>/dist/shipl.js"></script>
 ```
@@ -88,9 +87,9 @@ Then to instantiate the shipl object from the browser window object:
 
 ```javascript
 const Shipl = window.shipl
-const shipl = new Shipl({ privateKey, network })
+const shipl = new Shipl({ web3Provider: window.web3, network })
 ```
 
 ## Examples
 
-For a more in depth guide, check out our documentation site or clone this repository and check out the sample apps in the [`/examples`](https://github.com/shiplco/shipl-sdk/tree/master/examples/node-integration-tutorial) folder.
+For a more in depth guide, check out our documentation site or clone this repository and check out the sample apps in the [`/examples`](https://github.com/shiplco/shipl-sdk/tree/master/examples/) folder.

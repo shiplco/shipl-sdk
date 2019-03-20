@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/ethjs@0.3.4/dist/ethjs.min.js"></script>
+        <script type='module' src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.34/dist/web3.min.js"></script>
+        <!-- <script type='module' src="https://unpkg.com/shipl/dist/shipl.js"></script> -->
+        <script type='module' src="../../dist/shipl.js"></script>
+        <script src="./main.js"></script>
+        <title>Shipl demo</title>
+    </head>
+
+    <body>
+        <section>
+            <h1>Shipl browser integration</h1>
+            
+            <p>Change the numeric value stored in the smart contract for the corresponding address</p>
+            <h3>The value <span class="black"><span id="balance"></span> is registered for this identity/proxy contract <span id="identity"></span></span>
+                controlled by this deviceKey <span id="deviceKey"></span>
+            </h3>
+            <label for="amount">Amount:</label><input type="number" id="amount" placeholder="e.g., 42"></input>
+            <br><br><button id="send" onclick="App.register()">Change the value</button>
+        </section>
+    </body>
+    <body>
+</html>
+
+        

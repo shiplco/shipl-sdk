@@ -11,6 +11,7 @@ const globalsPlugin = new webpack.DefinePlugin({
 const libraryName = 'shipl'
 
 const serverConfig = {
+  mode: 'production',
   entry: { [libraryName]: './src/index.js' },
   devtool: 'source-map',
   output: {
@@ -22,8 +23,7 @@ const serverConfig = {
   'target': 'node',
   module: {
     rules: [
-      { test: /\.(t|j)sx?$/, use: { loader: 'babel-loader' } },
-      { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader' }
+      { test: /\.(t|j)sx?$/, use: { loader: 'babel-loader' } }
     ]
   },
   node: {
@@ -53,6 +53,7 @@ const serverConfig = {
 }
 
 const clientConfig = {
+  // mode: 'production',
   entry: { [libraryName]: './src/index.js' },
   devtool: 'source-map',
   output: {
@@ -64,8 +65,7 @@ const clientConfig = {
   target: 'web',
   module: {
     rules: [
-      { test: /\.(t|j)sx?$/, use: { loader: 'babel-loader' } },
-      { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader' }
+      { test: /\.(t|j)sx?$/, use: { loader: 'babel-loader' } }
     ]
   },
   node: {
