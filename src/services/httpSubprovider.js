@@ -39,8 +39,7 @@ class RpcSource extends Subprovider {
       }
       switch (res.statusCode) {
         case 400:
-        // { [Error: Invalid Request] message: 'Invalid Request', code: -32600 }
-          return end(new JsonRpcError.InternalError(new Error(JSON.parse(body).message)))
+          return end(new Error(JSON.parse(body).data.message))
         case 405:
           return end(new JsonRpcError.MethodNotFound())
         case 504: // Gateway timeout
@@ -50,7 +49,7 @@ class RpcSource extends Subprovider {
         default:
           if (res.statusCode !== 200) {
             console.log(body)
-            return end(new JsonRpcError.InternalError(res.body))
+            return end(new Error(JSON.parse(body).data.message))
           }
       }
 

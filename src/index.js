@@ -44,7 +44,7 @@ class Provider {
         this.rpcUrl = 'https://rinkeby.infura.io'
         this.txRelayAddress = '0xda8c6dce9e9a85e6f9df7b09b2354da44cb48331'
         this.metaIdentityManagerAddress = '0x87ea811785c4bd30fc104c2543cf8ed90f7eeec7'
-        this.txSenderAddress = '0xb01ab511d04082fd2615e7bbf9fdd7debc887519' // In a near future these address will not be the same because on all the networks of the use of mnid on sensui
+        this.txSenderAddress = '0xb01ab511d04082fd2615e7bbf9fdd7debc887519'
         break
       case 'ropsten':
         this.ordersServiceUrl = 'https://testnet.api.shipl.co/orders'
@@ -63,20 +63,20 @@ class Provider {
         this.txSenderAddress = '0xb01ab511d04082fd2615e7bbf9fdd7debc887519'
         break
       case 'poa':
-        this.ordersServiceUrl = 'https://poa.api.shipl.co/orders'
-        this.authUrl = 'https://poa.api.shipl.co/auth'
+        this.ordersServiceUrl = 'https://mainnet.api.shipl.co/orders'
+        this.authUrl = 'https://mainnet.api.shipl.co/auth'
         this.rpcUrl = 'https://core.poa.network'
         this.txRelayAddress = '0xfd36f89fd9c148cb07047fcd3644f55008122017'
         this.metaIdentityManagerAddress = '0x3cf59cb93579719d450488a039dcdfda321289f2'
-        this.txSenderAddress = ''
+        this.txSenderAddress = '0x010a196aa6250095a6e63de58da475c138045911'
         break
       case 'xdai':
-        this.ordersServiceUrl = 'https://xdai.api.shipl.co/orders'
-        this.authUrl = 'https://xdai.api.shipl.co/auth'
+        this.ordersServiceUrl = 'https://mainnet.api.shipl.co/orders'
+        this.authUrl = 'https://mainnet.api.shipl.co/auth'
         this.rpcUrl = 'https://xdai.poa.network'
-        this.txRelayAddress = ''
-        this.metaIdentityManagerAddress = ''
-        this.txSenderAddress = ''
+        this.txRelayAddress = '0x2ba73595be818992455537d352c97372c4b288f5'
+        this.metaIdentityManagerAddress = '0xad7112da4cc81f1da0271fc3d0e2300d68613d7c'
+        this.txSenderAddress = '0x010a196aa6250095a6e63de58da475c138045911'
         break
       case 'mainnet':
         this.ordersServiceUrl = 'https://mainnet.api.shipl.co/orders'
@@ -84,7 +84,7 @@ class Provider {
         this.rpcUrl = 'https://mainnet.infura.io'
         this.txRelayAddress = '0xec2642cd5a47fd5cca2a8a280c3b5f88828aa578'
         this.metaIdentityManagerAddress = '0x27500ae27b6b6ad7de7d64b1def90f3e6e7ced47'
-        this.txSenderAddress = '0x1f54b329a77daacb065f34fe5eb20a455d7550c3'
+        this.txSenderAddress = '0x010a196aa6250095a6e63de58da475c138045911'
         break
       default:
         this.rpcUrl = rpcUrl
@@ -94,7 +94,7 @@ class Provider {
         break
     }
     this.isWeb3Provided = web3Provider !== undefined
-    this.web3 = ((this.isWeb3Provided === true) ? new Web3(web3Provider.currentProvider) : new Web3(this.rpcUrl))
+    this.web3 = ((this.isWeb3Provided === true) ? new Web3(web3Provider.currentProvider || web3Provider) : new Web3(this.rpcUrl))
     if (this.isWeb3Provided === true) {
       this.senderKeyPair.address = window.web3.eth.defaultAccount || this.web3.eth.defaultAccount
     } else if (privateKey !== undefined) {
@@ -107,7 +107,6 @@ class Provider {
         this.web3.eth.sign(hash, this.senderKeyPair.address, (error, sig) => {
           if (error) reject(error)
           if (sig.error) reject(new Error(sig.error.message))
-          console.log(sig)
           resolve(sig)
         })
       })
@@ -221,7 +220,7 @@ class Provider {
         }
       }
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
   }
   getWeb3Provider () {
@@ -248,7 +247,7 @@ class Provider {
           },
           signTransaction: async (txParams) => {
             const txRelayNonce = await this.TxRelay.methods.getNonce(this.senderKeyPair.address).call()
-            txParams.nonce = Web3.utils.toHex(txRelayNonce)
+            txParams.nonce = this.web3.utils.toHex(txRelayNonce)
             txParams.data = this.web3.eth.abi.encodeFunctionCall({
               'inputs': [
                 {
@@ -312,13 +311,13 @@ class Provider {
         getAccessToken: this.getAccessToken
       }))
       engine.on('error', error => {
-        console.error(error.stack)
+        console.error(error)
       })
       engine.start()
       return engine
     } catch (error) {
       console.log(error)
-      throw new Error(error)
+      throw error
     }
   }
 }

@@ -78,10 +78,9 @@ window.addEventListener('load', async function () {
   if (window.ethereum) {
     try {
       window.accounts = await window.ethereum.enable()
-      window.shipl = new window.shipl({ web3Provider: window.web3, network: 'rinkeby', appId })
+      window.shipl = new window.shipl({ web3Provider: window.ethereum, network: 'rinkeby', appId })
       const { identity, deviceKey } = await window.shipl.login(window.prompt)
       window.identity = identity
-      console.log('Proxy contract adddress', identity)
       console.log('Local address', deviceKey)
       const identityElement = document.getElementById('identity')
       identityElement.innerHTML = identity

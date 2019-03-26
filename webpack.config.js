@@ -53,7 +53,7 @@ const serverConfig = {
 }
 
 const clientConfig = {
-  // mode: 'production',
+  mode: 'production',
   entry: { [libraryName]: './src/index.js' },
   devtool: 'source-map',
   output: {

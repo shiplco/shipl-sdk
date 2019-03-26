@@ -4,7 +4,7 @@ This the reference implementation of the [shipl-sdk](https://github.com/shipl/sh
 
 ## Run
 
-You can run it with http-server
+You can serve this example website with http-server
 
 ```javascript
    http-server

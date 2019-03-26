@@ -17,6 +17,8 @@ class IdMngt {
     this.senderKeyPair = senderKeyPair
 
     this.refreshToken = this.refreshToken.bind(this)
+    this.initiateAuth = this.initiateAuth.bind(this)
+    this.respondToAuthChallenge = this.respondToAuthChallenge.bind(this)
     this.login = this.login.bind(this)
     this.signUp = this.signUp.bind(this)
     this.resendConfirmationCode = this.resendConfirmationCode.bind(this)
@@ -24,10 +26,12 @@ class IdMngt {
     this.lookupIdCreation = this.lookupIdCreation.bind(this)
   }
   async login (deviceKey) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+
     try {
-      const res = await this.auth.post('/initiateAuth', { username: deviceKey, appId: this.appId })
-      const data = res.data.data.ChallengeParameters.messageToSign
-      const session = res.data.data.Session
+      const res = await this.initiateAuth(deviceKey)
+      const data = res.ChallengeParameters.messageToSign
+      const session = res.Session
       let signature
       if (this.isWeb3Provided === true) {
         signature = await this.signFunction(data)
@@ -38,48 +42,77 @@ class IdMngt {
           { data: msgParams }
         )
       }
-      const response = await this.auth.post('/respondToAuthChallenge', { deviceKey, signature, session })
-      return response.data.data.AuthenticationResult
+      const response = await this.respondToAuthChallenge(deviceKey, signature, session)
+      return response
     } catch (error) {
-      console.error(error)
-      throw new Error(error)
+      throw error
+    }
+  }
+  async initiateAuth (deviceKey) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+
+    try {
+      const result = await this.auth.post('/initiateAuth', { username: deviceKey, appId: this.appId })
+      return result.data.data
+    } catch (error) {
+      throw error.response.data.message
+    }
+  }
+  async respondToAuthChallenge (deviceKey, signature, session) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+    if (!signature) throw new Error('missing signature')
+    if (!session) throw new Error('missing session')
+
+    try {
+      const result = await this.auth.post('/respondToAuthChallenge', { deviceKey, signature, session })
+      return result.data.data.AuthenticationResult
+    } catch (error) {
+      throw error.response.data.message
     }
   }
   async refreshToken (refreshToken) {
-    console.log('refresh token', refreshToken)
+    if (!refreshToken) throw new Error('missing refreshToken')
+
     try {
       const result = await this.auth.post('/refreshToken', { refreshToken })
       return result.data.data.AuthenticationResult
     } catch (error) {
-      console.error(error)
-      throw new Error(error)
+      throw error.response.data.message
     }
   }
   async signUp (deviceKey, phoneNumber) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+    if (!phoneNumber) throw new Error('missing phoneNumber')
+
     try {
       await this.auth.post('/signup', { username: deviceKey, phoneNumber, appId: this.appId })
     } catch (error) {
-      console.error(error)
-      throw new Error(error)
+      throw error.response.data.message
     }
   }
   async confirmSignUp (deviceKey, confirmationCode) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+    if (!confirmationCode) throw new Error('missing confirmationCode')
+
     try {
       await this.auth.post('/confirmSignup', { username: deviceKey, confirmationCode })
     } catch (error) {
-      console.error(error)
-      throw new Error(error)
+      throw error.response.data.message
     }
   }
   async resendConfirmationCode (deviceKey) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+
     try {
       await this.auth.post('/resendConfirmationCode', { username: deviceKey })
     } catch (error) {
-      console.error(error)
-      throw new Error(error)
+      throw error.response.data.message
     }
   }
   async lookupIdCreation (deviceKey, network) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+    if (!network) throw new Error('missing network')
+
     const timeout = 60000
     const interval = 1000
     const endTime = Number(new Date()) + (timeout)
@@ -87,7 +120,6 @@ class IdMngt {
     const checkCondition = async (resolve, reject) => {
       try {
         const result = await this.auth.post('/lookup', { deviceKey, network })
-        console.log('result', result.data)
         if (result.data.data === 'no record found') {
           resolve('no record found')
         } else if (result.data.data === 'null identity. Not mined yet?' && Number(new Date()) < endTime) {
@@ -96,13 +128,14 @@ class IdMngt {
           resolve(result.data.data)
         }
       } catch (error) {
-        console.log(error)
         reject(error)
       }
     }
     return new Promise(checkCondition)
   }
   async loginOrSignup (deviceKey, inputCallback) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+
     const idExist = await this.lookupIdCreation(deviceKey, this.network)
     try {
       if (idExist === 'no record found') {
@@ -116,7 +149,7 @@ class IdMngt {
       } else {
         const authToken = await this.login(this.senderKeyPair.address)
         const decodedIdentityObj = jwtDecode(authToken.IdToken)
-        if (this.network === 'mainnet' || this.network === 'rinkeby' || this.network === 'ropsten' || this.network === 'kovan') {
+        if (this.network === 'mainnet' || this.network === 'xdai' || this.network === 'poa' || this.network === 'rinkeby' || this.network === 'ropsten' || this.network === 'kovan') {
           const proxyAddress = decodedIdentityObj['custom:identity-' + this.network]
           return {
             authToken,
@@ -128,8 +161,7 @@ class IdMngt {
         }
       }
     } catch (error) {
-      console.error(error)
-      throw new Error(error)
+      throw error
     }
   }
 }
