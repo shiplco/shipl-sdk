@@ -41,7 +41,7 @@ class Provider {
       case 'rinkeby':
         this.ordersServiceUrl = 'https://testnet.api.shipl.co/orders'
         this.authUrl = 'https://testnet.api.shipl.co/auth'
-        this.rpcUrl = 'https://rinkeby.infura.io'
+        this.rpcUrl = 'https://rinkeby.infura.io/v3/e9b9f45b940d4ff3a6a54e0501ecfa0d'
         this.txRelayAddress = '0xda8c6dce9e9a85e6f9df7b09b2354da44cb48331'
         this.metaIdentityManagerAddress = '0x87ea811785c4bd30fc104c2543cf8ed90f7eeec7'
         this.txSenderAddress = '0xb01ab511d04082fd2615e7bbf9fdd7debc887519'
@@ -49,7 +49,7 @@ class Provider {
       case 'ropsten':
         this.ordersServiceUrl = 'https://testnet.api.shipl.co/orders'
         this.authUrl = 'https://testnet.api.shipl.co/auth'
-        this.rpcUrl = 'https://ropsten.infura.io'
+        this.rpcUrl = 'https://ropsten.infura.io/v3/e9b9f45b940d4ff3a6a54e0501ecfa0d'
         this.txRelayAddress = '0xa5e04cf2942868f5a66b9f7db790b8ab662039d5'
         this.metaIdentityManagerAddress = '0xbdaf396ce9b9b9c42cd40d37e01b5dbd535cc960'
         this.txSenderAddress = '0xb01ab511d04082fd2615e7bbf9fdd7debc887519'
@@ -57,7 +57,7 @@ class Provider {
       case 'kovan':
         this.ordersServiceUrl = 'https://testnet.api.shipl.co/orders'
         this.authUrl = 'https://testnet.api.shipl.co/auth'
-        this.rpcUrl = 'https://kovan.infura.io'
+        this.rpcUrl = 'https://kovan.infura.io/v3/e9b9f45b940d4ff3a6a54e0501ecfa0d'
         this.txRelayAddress = '0xa9235151d3afa7912e9091ab76a36cbabe219a0c'
         this.metaIdentityManagerAddress = '0x737f53c0cebf0acd1ea591685351b2a8580702a5'
         this.txSenderAddress = '0xb01ab511d04082fd2615e7bbf9fdd7debc887519'
@@ -81,7 +81,7 @@ class Provider {
       case 'mainnet':
         this.ordersServiceUrl = 'https://mainnet.api.shipl.co/orders'
         this.authUrl = 'https://mainnet.api.shipl.co/auth'
-        this.rpcUrl = 'https://mainnet.infura.io'
+        this.rpcUrl = 'https://mainnet.infura.io/v3/e9b9f45b940d4ff3a6a54e0501ecfa0d'
         this.txRelayAddress = '0xec2642cd5a47fd5cca2a8a280c3b5f88828aa578'
         this.metaIdentityManagerAddress = '0x27500ae27b6b6ad7de7d64b1def90f3e6e7ced47'
         this.txSenderAddress = '0x010a196aa6250095a6e63de58da475c138045911'
