@@ -78,7 +78,7 @@ window.addEventListener('load', async function () {
   if (window.ethereum) {
     try {
       window.accounts = await window.ethereum.enable()
-      window.shipl = new window.shipl({ web3Provider: window.ethereum, network: 'rinkeby', appId })
+      window.shipl = new window.shipl({ web3Provider: window.ethereum, network: 'rinkeby', appId }) // eslint-disable-line
       const { identity, deviceKey } = await window.shipl.login(window.prompt)
       window.identity = identity
       console.log('Local address', deviceKey)
@@ -87,7 +87,7 @@ window.addEventListener('load', async function () {
       const deviceKeyElement = document.getElementById('deviceKey')
       deviceKeyElement.innerHTML = deviceKey
       window.web3 = new window.Eth(window.shipl.getWeb3Provider())
-      window.contract = new window.web3.contract(contractAbi).at(targetContractAddress)
+      window.contract = new window.web3.contract(contractAbi).at(targetContractAddress) // eslint-disable-line
       window.App.refreshBalance()
     } catch (error) {
       console.error(error)

@@ -1,11 +1,10 @@
-// const Shipl = require('Shipl')
-const Shipl = require('../../src')
+const Shipl = require('shipl')
 const Web3 = require('web3')
 const readline = require('readline-sync')
 const { Wallet } = require('ethers')
 const targetContractArtifact = require('../shared/targetContract.json')
 
-const privateKey = new Wallet.createRandom().privateKey.slice(2) /* We generate a random ethereum private key */
+const privateKey = new Wallet.createRandom().privateKey.slice(2) /* We generate a random ethereum private key */ // eslint-disable-line
 
 const targetContractAddress = '0xabc59d9a5163d5ab600cccd9108bf532d8d9d7a5' // rinkeby
 // const targetContractAddress = '0xfce866a681cc2bcfb727afc4fb133ff67506cd62' // xdai
