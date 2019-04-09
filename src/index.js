@@ -2,6 +2,9 @@ const BlueBird = require('bluebird')
 const Transaction = require('ethereumjs-tx')
 const UportIdentity = require('uport-identity')
 const Web3 = require('web3')
+const util = require('ethereumjs-util')
+const ethSigUtil = require('eth-sig-util')
+const jwtDecode = require('jwt-decode')
 const ProviderEngine = require('web3-provider-engine')
 const CacheSubprovider = require('web3-provider-engine/subproviders/cache.js')
 const FixtureSubprovider = require('web3-provider-engine/subproviders/fixture.js')
@@ -13,24 +16,24 @@ const HttpSubprovider = require('./services/httpSubprovider.js')
 const TxRelaySigner = require('./services/shipl-eth-signer/txRelaySigner')
 const KeyPair = require('./services/shipl-eth-signer/generators/keyPair')
 const InternalTxDisecter = require('./services/decoder')
-const IdMgnt = require('./services/idMgnt')
+const shiplID = require('./services/shiplID')
 
 const engine = new ProviderEngine()
 const txRelayArtifact = UportIdentity.TxRelay.v2
 
 class Provider {
-  constructor (
-    { appId,
-      privateKey,
-      web3Provider,
-      proxyAddress,
-      network,
-      rpcUrl,
-      txRelayAddress,
-      metaIdentityManagerAddress,
-      txSenderAddress,
-      whiteListAddress = '0x0000000000000000000000000000000000000000'
-    }) {
+  constructor({
+    appId,
+    privateKey,
+    web3Provider,
+    proxyAddress,
+    network,
+    rpcUrl,
+    txRelayAddress,
+    metaIdentityManagerAddress,
+    txSenderAddress,
+    whiteListAddress = '0x0000000000000000000000000000000000000000'
+  }) {
     this.rpcUrl = rpcUrl
     this.appId = appId
     this.network = network
@@ -48,7 +51,7 @@ class Provider {
         break
       case 'ropsten':
         this.ordersServiceUrl = 'https://testnet.api.shipl.co/orders'
-        this.authUrl = 'https://testnet.api.shipl.co/auth'
+        this.authUrl = 'https://6o0tys3etb.execute-api.us-east-1.amazonaws.com/production' // FIXME: change it
         this.rpcUrl = 'https://ropsten.infura.io/v3/e9b9f45b940d4ff3a6a54e0501ecfa0d'
         this.txRelayAddress = '0xa5e04cf2942868f5a66b9f7db790b8ab662039d5'
         this.metaIdentityManagerAddress = '0xbdaf396ce9b9b9c42cd40d37e01b5dbd535cc960'
@@ -94,7 +97,10 @@ class Provider {
         break
     }
     this.isWeb3Provided = web3Provider !== undefined
-    this.web3 = ((this.isWeb3Provided === true) ? new Web3(web3Provider.currentProvider || web3Provider) : new Web3(this.rpcUrl))
+    this.web3 =
+      this.isWeb3Provided === true
+        ? new Web3(web3Provider.currentProvider || web3Provider)
+        : new Web3(this.rpcUrl)
     if (this.isWeb3Provided === true) {
       this.senderKeyPair.address = window.web3.eth.defaultAccount || this.web3.eth.defaultAccount
     } else if (privateKey !== undefined) {
@@ -102,16 +108,19 @@ class Provider {
     } else {
       throw new Error('A web3 provider, or a private key, should be passed')
     }
-    this.signFunction = async (hash) => { // should be remove in a near future
+    this.signFunction = async hash => {
+      // should be remove in a near future
       return new Promise((resolve, reject) => {
         this.web3.eth.sign(hash, this.senderKeyPair.address, (error, sig) => {
           if (error) reject(error)
-          if (sig.error) reject(new Error(sig.error.message))
+          if (sig.error) {
+            reject(new Error(sig.error.message))
+          }
           resolve(sig)
         })
       })
     }
-    this.signTypedDataFunction = async (hash) => {
+    this.signTypedDataFunction = async hash => {
       return new Promise((resolve, reject) => {
         const msgParams = [{ type: 'string', name: 'Message', value: hash }]
         this.web3.currentProvider.sendAsync(
@@ -120,7 +129,7 @@ class Provider {
             params: [msgParams, this.senderKeyPair.address],
             from: this.senderKeyPair.address
           },
-          function (err, result) {
+          function(err, result) {
             if (err) {
               reject(err)
             }
@@ -129,101 +138,61 @@ class Provider {
         )
       })
     }
-    this.TxRelay = BlueBird.promisifyAll(new this.web3.eth.Contract(txRelayArtifact.abi, this.txRelayAddress))
-    this.txRelaySigner = new TxRelaySigner(this.senderKeyPair, this.txRelayAddress, this.txSenderAddress, this.whiteListAddress)
+    this.TxRelay = BlueBird.promisifyAll(
+      new this.web3.eth.Contract(txRelayArtifact.abi, this.txRelayAddress)
+    )
+    this.txRelaySigner = new TxRelaySigner(
+      this.senderKeyPair,
+      this.txRelayAddress,
+      this.txSenderAddress,
+      this.whiteListAddress
+    )
     this.internalTxDisecter = new InternalTxDisecter(this.web3)
-    this.idMgnt = new IdMgnt({
-      isWeb3Provided: this.isWeb3Provided,
-      signFunction: this.signTypedDataFunction,
-      appId: this.appId,
-      authUrl: this.authUrl,
-      blockchain: this.network,
-      senderKeyPair: this.senderKeyPair })
+    this.shiplID = new shiplID({ appId: this.appId, client: 'meta', authUrl: this.authUrl })
     this.getInternalTransactionsData = this.internalTxDisecter.getInternalTransactionsData
-    this.getAccessToken = this.getAccessToken.bind(this)
+
+    // BINDING
     this.login = this.login.bind(this)
     this.getWeb3Provider = this.getWeb3Provider.bind(this)
   }
-  async getAccessToken () {
-    if (typeof window !== 'undefined') {
-      if (window.localStorage.getItem('SHIPLIdentity') !== 'undefined' && window.localStorage.getItem('SHIPLIdentity') !== null &&
-          window.localStorage.getItem('SHIPLAccessToken') !== 'undefined' && window.localStorage.getItem('SHIPLAccessToken') !== null &&
-          window.localStorage.getItem('SHIPLRefreshToken') !== 'undefined' && window.localStorage.getItem('SHIPLRefreshToken') !== null &&
-          window.localStorage.getItem('SHIPLIdToken') !== 'undefined' && window.localStorage.getItem('SHIPLIdToken') !== null &&
-          window.localStorage.getItem('SHIPLExpiresIn') !== 'undefined' && window.localStorage.getItem('SHIPLExpiresIn') !== null &&
-          window.localStorage.getItem('SHIPLTokenType') !== 'undefined' && window.localStorage.getItem('SHIPLTokenType') !== null
-      ) {
-        const expiresInMiliSeconds = parseInt(window.localStorage.getItem('SHIPLExpiresIn')) * 1000
-        const tokenAge = parseInt(window.localStorage.getItem('SHIPLcreationDateOfAccessToken')) + expiresInMiliSeconds
-        if (Date.now() + 30000 >= tokenAge) {
-          const authToken = await this.idMgnt.refreshToken(window.localStorage.getItem('SHIPLRefreshToken'))
-          this.authToken = authToken
-          window.localStorage.setItem('SHIPLAccessToken', authToken.AccessToken)
-          window.localStorage.setItem('SHIPLIdToken', authToken.IdToken)
-          window.localStorage.setItem('SHIPLExpiresIn', authToken.ExpiresIn)
-          window.localStorage.setItem('SHIPLTokenType', authToken.TokenType)
-          return authToken.IdToken
-        } else {
-          return {
-            identity: window.localStorage.getItem('SHIPLIdentity'),
-            AccessToken: window.localStorage.getItem('SHIPLAccessToken'),
-            IdToken: window.localStorage.getItem('SHIPLIdToken'),
-            RefreshToken: window.localStorage.getItem('SHIPLRefreshToken'),
-            TokenType: window.localStorage.getItem('SHIPLTokenType'),
-            ExpiresIn: window.localStorage.getItem('SHIPLIdToken')
-          }
-        }
-      } else {
-        return null
-      }
-    } else {
-      return this.authToken
-    }
-  }
-  async setAccessToken (authToken, identity) {
-    this.authToken = authToken
-    this.proxyAddress = identity
-    window.localStorage.setItem('SHIPLIdentity', identity)
-    window.localStorage.setItem('SHIPLcreationDateOfAccessToken', Date.now())
-    window.localStorage.setItem('SHIPLAccessToken', authToken.AccessToken)
-    window.localStorage.setItem('SHIPLRefreshToken', authToken.RefreshToken)
-    window.localStorage.setItem('SHIPLIdToken', authToken.IdToken)
-    window.localStorage.setItem('SHIPLExpiresIn', authToken.ExpiresIn)
-    window.localStorage.setItem('SHIPLTokenType', authToken.TokenType)
-  }
 
-  async login (inputCallback) {
+  async login(inputCallback) {
+    if (!inputCallback) throw new Error('missing inputCallback') // FIXME: regex check
+
+    let result
+    let signature
     try {
-      if (typeof window !== 'undefined') {
-        this.authToken = await this.getAccessToken()
-        if (this.authToken === null) {
-          const { authToken, identity } = await this.idMgnt.loginOrSignup(this.senderKeyPair.address, inputCallback)
-          await this.setAccessToken(authToken, identity)
-          return {
-            deviceKey: this.senderKeyPair.address,
-            identity: this.proxyAddress
-          }
+      const phoneNumber = '+17605717437' // FIXME: await inputCallback('Enter your phone number: ')
+      result = await this.shiplID.login(phoneNumber, this.senderKeyPair.address)
+      if (result.session) {
+        if (this.isWeb3Provided === true) {
+          signature = await this.signFunction(result.challenge)
         } else {
-          this.proxyAddress = this.authToken.identity
-          return {
-            deviceKey: this.senderKeyPair.address,
-            identity: this.proxyAddress
-          }
+          const msgParams = [{ type: 'string', name: 'Message', value: result.challenge }]
+          signature = ethSigUtil.signTypedData(
+            Buffer.from(util.stripHexPrefix(this.senderKeyPair.privateKey), 'hex'),
+            { data: msgParams }
+          )
         }
       } else {
-        const { authToken, identity } = await this.idMgnt.loginOrSignup(this.senderKeyPair.address, inputCallback)
-        this.authToken = authToken
-        this.proxyAddress = identity
-        return {
-          deviceKey: this.senderKeyPair.address,
-          identity: this.proxyAddress
-        }
+        signature = await inputCallback('Enter your confirmation code: ')
+      }
+      result = await this.shiplID.verify(signature)
+      const decodedIdentityObj = jwtDecode(result.token.IdToken)
+      const identity = decodedIdentityObj['custom:identity-' + this.network]
+      this.proxyAddress = identity
+
+      return {
+        authToken: result.token,
+        deviceKey: this.senderKeyPair.address,
+        identity
       }
     } catch (error) {
       throw error
     }
   }
-  getWeb3Provider () {
+
+  getWeb3Provider() {
     try {
       engine.addProvider(
         new FixtureSubprovider({
@@ -239,44 +208,52 @@ class Provider {
       engine.addProvider(new NonceTrackerSubprovider())
       engine.addProvider(
         new HookedWalletSubprovider({
-          getAccounts: (cb) => {
+          getAccounts: cb => {
             cb(null, [this.senderKeyPair.address])
           },
-          getPrivateKey: (cb) => {
+          getPrivateKey: cb => {
             cb(null, this.senderKeyPair.privateKey)
           },
-          signTransaction: async (txParams) => {
-            const txRelayNonce = await this.TxRelay.methods.getNonce(this.senderKeyPair.address).call()
+          signTransaction: async txParams => {
+            const txRelayNonce = await this.TxRelay.methods
+              .getNonce(this.senderKeyPair.address)
+              .call()
             txParams.nonce = this.web3.utils.toHex(txRelayNonce)
-            txParams.data = this.web3.eth.abi.encodeFunctionCall({
-              'inputs': [
-                {
-                  'name': 'sender',
-                  'type': 'address'
-                },
-                {
-                  'name': 'identity',
-                  'type': 'address'
-                },
-                {
-                  'name': 'destination',
-                  'type': 'address'
-                },
-                {
-                  'name': 'value',
-                  'type': 'uint256'
-                },
-                {
-                  'name': 'data',
-                  'type': 'bytes'
-                }],
-              'name': 'forwardTo',
-              'type': 'function' }, [
-              this.senderKeyPair.address,
-              this.proxyAddress,
-              txParams.to,
-              txParams.value || 0,
-              txParams.data])
+            txParams.data = this.web3.eth.abi.encodeFunctionCall(
+              {
+                inputs: [
+                  {
+                    name: 'sender',
+                    type: 'address'
+                  },
+                  {
+                    name: 'identity',
+                    type: 'address'
+                  },
+                  {
+                    name: 'destination',
+                    type: 'address'
+                  },
+                  {
+                    name: 'value',
+                    type: 'uint256'
+                  },
+                  {
+                    name: 'data',
+                    type: 'bytes'
+                  }
+                ],
+                name: 'forwardTo',
+                type: 'function'
+              },
+              [
+                this.senderKeyPair.address,
+                this.proxyAddress,
+                txParams.to,
+                txParams.value || 0,
+                txParams.data
+              ]
+            )
             txParams.to = this.metaIdentityManagerAddress
 
             const tx = new Transaction(txParams)
@@ -293,7 +270,7 @@ class Provider {
               blockchain: this.network,
               appId: this.appId
             }
-            return (null, params)
+            return null, params
           }
         })
       )
@@ -304,12 +281,13 @@ class Provider {
       })
       engine.addProvider(filterAndSubsSubprovider)
 
-      engine.addProvider(new HttpSubprovider({
-        rpcUrl: this.rpcUrl,
-        ordersServiceUrl: this.ordersServiceUrl,
-        authToken: this.authToken,
-        getAccessToken: this.getAccessToken
-      }))
+      engine.addProvider(
+        new HttpSubprovider({
+          rpcUrl: this.rpcUrl,
+          ordersServiceUrl: this.ordersServiceUrl,
+          getIdToken: this.shiplID.getIdToken
+        })
+      )
       engine.on('error', error => {
         console.error(error)
       })
