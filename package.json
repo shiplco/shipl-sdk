@@ -20,7 +20,7 @@
   "main": "./dist/shipl.node.js",
   "browser": "./dist/shipl.js",
   "scripts": {
-    "build": "npm run build-dist",
+    "build": "npm run build-dist && rm -Rf ./examples/browser/dist/ && cp -Rf ./dist/ ./examples/browser/dist/",
     "build-dist": "webpack --config webpack.config.js",
     "build-dist-prod": "webpack --config webpack.prod.js",
     "test": "jest --forceExit --coverage --verbose",

@@ -1,6 +1,6 @@
-const targetContractAddress = '0xabc59d9a5163d5ab600cccd9108bf532d8d9d7a5' // testnet
+const targetContractAddress = '0xAbC59d9a5163d5AB600ccCd9108bF532D8d9D7A5' // testnet
 // const targetContractAddress = '0xd35D57Fb2ED34a52F0697D37fb6bC0f182de7475' // mainnet
-const appId = 'YOUR_SHIPL_APP_ID' // testnet
+const appId = '5fc6c72e-db33-4829-9a81-a4227b96238c'//'YOUR_SHIPL_APP_ID' // testnet
 
 const contractAbi = [
   {
@@ -78,7 +78,7 @@ window.addEventListener('load', async function () {
   if (window.ethereum) {
     try {
       window.accounts = await window.ethereum.enable()
-      window.shipl = new window.shipl({ web3Provider: window.ethereum, network: 'rinkeby', appId }) // eslint-disable-line
+      window.shipl = new window.shipl({ web3Provider: window.ethereum, network: 'ropsten', appId }) // eslint-disable-line
       const { identity, deviceKey } = await window.shipl.login(window.prompt)
       window.identity = identity
       console.log('Local address', deviceKey)

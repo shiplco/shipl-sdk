@@ -102,16 +102,18 @@ class Provider {
         ? new Web3(web3Provider.currentProvider || web3Provider)
         : new Web3(this.rpcUrl)
     if (this.isWeb3Provided === true) {
-      this.senderKeyPair.address = window.web3.eth.defaultAccount || this.web3.eth.defaultAccount
+      this.senderKeyPair.address =
+        this.web3.currentProvider.selectedAddress || this.web3.eth.defaultAccount
     } else if (privateKey !== undefined) {
       this.senderKeyPair = KeyPair.fromPrivateKey(privateKey)
     } else {
       throw new Error('A web3 provider, or a private key, should be passed')
     }
+    if (!this.senderKeyPair.address) throw new Error('Address not found')
+
     this.signFunction = async hash => {
-      // should be remove in a near future
       return new Promise((resolve, reject) => {
-        this.web3.eth.sign(hash, this.senderKeyPair.address, (error, sig) => {
+        this.web3.eth.personal.sign(hash, this.senderKeyPair.address, (error, sig) => {
           if (error) reject(error)
           if (sig.error) {
             reject(new Error(sig.error.message))
@@ -157,12 +159,12 @@ class Provider {
   }
 
   async login(inputCallback) {
-    if (!inputCallback) throw new Error('missing inputCallback') // FIXME: regex check
+    if (!inputCallback) throw new Error('missing inputCallback')
 
     let result
     let signature
     try {
-      const phoneNumber = '+17605717437' // FIXME: await inputCallback('Enter your phone number: ')
+      const phoneNumber = await inputCallback('Enter your phone number: ')
       result = await this.shiplID.login(phoneNumber, this.senderKeyPair.address)
       if (result.session) {
         if (this.isWeb3Provided === true) {

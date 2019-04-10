@@ -151,7 +151,6 @@ class ShiplID {
    */
   async verify(confirmationCode) {
     if (!confirmationCode) throw new Error('confirmation code is missing')
-    //FIXME: regex /^0x([A-Fa-f0-9]{64})$/
     switch (this.client) {
       case 'vaultx':
         break
