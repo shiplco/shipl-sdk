@@ -80,8 +80,8 @@ window.addEventListener('load', async function () {
       window.accounts = await window.ethereum.enable()
       window.shipl = new window.shipl({ web3Provider: window.ethereum, network: 'ropsten', appId }) // eslint-disable-line
       const { identity, deviceKey } = await window.shipl.login(window.prompt)
+      console.log('Local address', deviceKey, identity)
       window.identity = identity
-      console.log('Local address', deviceKey)
       const identityElement = document.getElementById('identity')
       identityElement.innerHTML = identity
       const deviceKeyElement = document.getElementById('deviceKey')

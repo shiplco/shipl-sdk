@@ -34,9 +34,15 @@ class ShiplID {
     this.getIdToken = this.getIdToken.bind(this)
     this.login = this.login.bind(this)
     this.verify = this.verify.bind(this)
+    this.isLogin = this.isLogin.bind(this)
 
     // INIT
     this.getAccessToken()
+  }
+
+  isLogin() {
+    if (this.auth && this.auth.userName && this.auth.token && this.auth.token.IdToken) return true
+    return false
   }
 
   getAccessToken() {
@@ -173,6 +179,13 @@ class ShiplID {
     } catch (error) {
       throw error
     }
+  }
+
+  async exist(deviceKey) {
+    if (!deviceKey) throw new Error('missing deviceKey')
+
+    const result = await this.vaultx.post('/exist', { deviceKey })
+    return result.data.data
   }
 }
 

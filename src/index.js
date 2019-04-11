@@ -163,23 +163,30 @@ class Provider {
 
     let result
     let signature
+    let phoneNumber
     try {
-      const phoneNumber = await inputCallback('Enter your phone number: ')
-      result = await this.shiplID.login(phoneNumber, this.senderKeyPair.address)
-      if (result.session) {
-        if (this.isWeb3Provided === true) {
-          signature = await this.signFunction(result.challenge)
-        } else {
-          const msgParams = [{ type: 'string', name: 'Message', value: result.challenge }]
-          signature = ethSigUtil.signTypedData(
-            Buffer.from(util.stripHexPrefix(this.senderKeyPair.privateKey), 'hex'),
-            { data: msgParams }
-          )
-        }
+      if (this.shiplID.isLogin()) {
+        result = this.shiplID.auth
       } else {
-        signature = await inputCallback('Enter your confirmation code: ')
+        if (!await this.shiplID.exist(this.senderKeyPair.address))
+          phoneNumber = await inputCallback('Enter your phone number: ')
+        result = await this.shiplID.login(phoneNumber, this.senderKeyPair.address)
+        if (result.session) {
+          const msgParams = [{ type: 'string', name: 'Message', value: result.challenge }]
+          console.log(msgParams)
+          if (this.isWeb3Provided === true) {
+            signature = await this.signTypedDataFunction(msgParams)
+          } else {
+            signature = ethSigUtil.signTypedData(
+              Buffer.from(util.stripHexPrefix(this.senderKeyPair.privateKey), 'hex'),
+              { data: msgParams }
+            )
+          }
+        } else {
+          signature = await inputCallback('Enter your confirmation code: ')
+        }
+        result = await this.shiplID.verify(signature)
       }
-      result = await this.shiplID.verify(signature)
       const decodedIdentityObj = jwtDecode(result.token.IdToken)
       const identity = decodedIdentityObj['custom:identity-' + this.network]
       this.proxyAddress = identity
