@@ -33,7 +33,7 @@ const shipl = new Shipl({
 })
 ```
 
-Then login into shipl. You have to pass an input callback to make the shipl SDK capable to ask for the phone number and then for the code verifcation send by SMS. For example on node you can use readline-sync. 
+Then login into shipl. You have to pass an input callback to make the shipl SDK capable to ask for the phone number and then for the code verification send by SMS. For example on node you can use readline-sync. 
 
 ```javascript
 const { identity, deviceKey } = await shipl.login(readline.question)
@@ -62,7 +62,7 @@ targetContract.methods
   });
 ```
 
-Finnaly you can get the internal transaction data by passing the txHash and contract abi to the method below.
+Finally you can get the internal transaction data by passing the txHash and contract abi to the method below.
 
 ```javascript
 const internalTxDatas = await shipl.getInternalTransactionsData(abi, txHash)
