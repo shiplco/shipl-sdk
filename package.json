@@ -45,7 +45,7 @@
     "solidity-sha3": "^0.4.1",
     "uport-identity": "^2.0.1",
     "util": "^0.11.0",
-    "web3": "^1.0.0-beta.35",
+    "web3": "^1.2.0",
     "web3-eth-abi": "^1.0.0-beta.35",
     "web3-provider-engine": "^14.2.0",
     "webpack-cli": "^3.0.8",
