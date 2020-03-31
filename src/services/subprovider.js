@@ -7,9 +7,11 @@ class Subprovider {
       this.currentBlock = block
     })
   }
+
   handleRequest (payload, next, end) {
     throw new Error('Subproviders should override `handleRequest`.')
   }
+
   emitPayload (payload, cb) {
     this.engine.sendAsync(createPayload(payload), cb)
   }

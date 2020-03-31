@@ -26,10 +26,8 @@ The package need to be configured with an ethereum private key or a web3 wallet 
 import Shipl from 'shipl';
 
 const shipl = new Shipl({
-    privateKey: "YOUR_PRIVATE_KEY", // You can provide a private key to shipl
-    web3Provider: window.web3, // Or a web3 compatible wallet like Metamask
-    network: 'rinkeby' // Can be rinkeby, ropsten or kovan (mainnet not available yet)
-    appId: 'YOUR_SHIPL_APP_ID' // This is the appID created in your Shipl Account at console.shipl.co
+    appId: 'YOUR_SHIPL_APP_ID', // This is the appID created in your Shipl Account at console.shipl.co
+    provider: 'shiplwallet'
 })
 ```
 
@@ -51,21 +49,10 @@ const targetContract = new web3.eth.Contract(abi, contractAddress);
 
 targetContract.methods
   .register('0x' + config.address, 1)
-  .send({
-    from: '0x' + config.address
-  })
-  .on('error', error => {
-    console.log(error);
-  })
+  .send({ from: '0x' + config.address })
   .on('transactionHash', transactionHash => {
     console.log('This the transactionHash', transactionHash);
   });
-```
-
-Finnaly you can get the internal transaction data by passing the txHash and contract abi to the method below.
-
-```javascript
-const internalTxDatas = await shipl.getInternalTransactionsData(abi, txHash)
 ```
 
 ### Browser Window Quick Start
@@ -87,9 +74,9 @@ Then to instantiate the shipl object from the browser window object:
 
 ```javascript
 const Shipl = window.shipl
-const shipl = new Shipl({ web3Provider: window.web3, network })
+const shipl = new Shipl({ appId: 'YOUR_SHIPL_APP_ID', provider: 'shiplwallet' })
 ```
 
 ## Examples
 
-For a more in depth guide, check out our documentation site or clone this repository and check out the sample apps in the [`/examples`](https://github.com/shiplco/shipl-sdk/tree/master/examples/) folder.
+For a more in depth guide, check out our documentation site or clone this [`poke shipl`](https://github.com/shiplco/poke-shipl) repository.

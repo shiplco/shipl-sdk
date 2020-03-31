@@ -64,3 +64,8 @@ sample_events/
 .webpack/
 
 .DS_Store
+
+.eslintrc.json
+.prettierrc.json
+
+dist/

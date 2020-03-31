@@ -64,3 +64,5 @@ sample_events/
 .webpack/
 
 .DS_Store
+
+src/
